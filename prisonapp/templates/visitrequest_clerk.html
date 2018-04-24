@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <link href="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../static/jquery-3.3.1.min.js"></script>
+
+    <script>
+        var tokens = localStorage.getItem('token');
+        $(document).ready(
+            function viewAll(){
+                table();
+                viewVis();
+                showRes();
+            })
+
+        function viewVis(){
+            $("#view_id").show();
+
+            $.ajax({
+                url: 'http://127.0.0.1:5000/api/clerk/manage_requests',
+                type: "GET",
+                dataType: "json",
+                crossDomain: true,
+                headers: {
+                    'x-access-token': tokens
+                },
+                success: function(resp) {
+                    if (resp.status  === 'ok') {
+                        for (i = 0; i < resp.count; i++) {
+
+                            vId = resp.entries[i].vId;
+                            nameP = resp.entries[i].nameP;
+                            date = resp.entries[i].date;
+                            numberOfVisitors = resp.entries[i].numberOfVisitors;
+                            status = resp.entries[i].status;
+
+                            $("#view_id").append(showRes(vId, nameP, date, numberOfVisitors ,status));
+                        }
+                    } else {
+                        $("#view_id").html("");
+                        alert('No Data')
+                    }
+                }
+            });
+        }
+
+        function showRes(vId, nameP, date, numberOfVisitors, status)
+        {
+            return '<div class="widget-content">'+
+                '<table class="table table-striped table-bordered" id="view_res">'+
+                '<tbody><tr class="edit" id="details">'+
+                '<td>'+ vId +'</td>'+
+                '<td>'+ nameP +'</td>'+
+                '<td>'+ date +'</td>'+
+                '<td>'+ numberOfVisitors +'</td>'+
+                '<td>'+ status +'</td>'+
+                '<td>'+ '<button type="Submit" onclick={accept(idU)}>Accept</button>'+'<input type="submit" name="Decline" value="Decline" id="btn" class="btn btn-info btn-block">'+'</td>'+
+                '</tr></tbody>' +
+            '</table>' +
+       '</div>'
+}
+
+function table()
+{
+     $("table.table-bordered").html('<thead><tr>' +
+            '<th>Visitor Name</th>' +
+            '<th>Prisoner Name</th>' +
+            '<th>Date</th>' +
+            '<th>Number Of Visitors</th>' +
+            '<th>Status</th>' +
+            '</tr></thead>')
+}
+    </script>
+</head>
+
+<body>
+<div class="container">
+    <div class="row">
+
+        <!--<div class="span7">-->
+            <div class="widget stacked widget-table action-table">
+                <div class="widget-content">
+                    <table class="table table-striped table-bordered">
+
+                    </table>
+                </div>
+                <div id="view_id"></div>
+            </div>
+        <!--</div>-->
+    </div>
+</div>
+</body>
+</html>
